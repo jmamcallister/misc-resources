@@ -24,14 +24,31 @@ die() { ${ECHO} "FATAL: $@" >&2; exit 1; }
 prg=$( basename "${BASH_SOURCE[0]}" )
 prg_dir=$( cd `dirname "${BASH_SOURCE[0]}"` && pwd )
 
+_usage="Usage: ${prg} [-c FILE] [-h]
+Some script
+
+Options:
+
+    -c FILE     Use FILE for configuration. Order of configuration loading:
+                    ${prg_dir}/${prg%.*}.conf
+                    ${prg_dir}/../etc/${prg%.*}.conf
+                These configurations can be overridden by FILE. The second entry
+                in the order is based on users having a folder structure like
+                '~/bin/' for their own scripts and '~/etc/' for their own
+                configurations
+    -h          Display this help
+"
 [ -r "${prg_dir}/${prg%.*}.conf" ] && . "${prg_dir}/${prg%.*}.conf"
 [ -r "${prg_dir}/../etc/${prg%.*}.conf" ] && . "${prg_dir}/../etc/${prg%.*}.conf"
 
-while getopts ":c:" opt; do
+while getopts ":c:h" opt; do
     case $opt in
         c)
             [ ! -r "${OPTARG}" ] && die "Cannot read config file ${OPTARG}"
             . ${OPTARG}
+            ;;
+        h)
+            echo "${_usage}"; exit 0
             ;;
         \?)
             die "Invalid option: -$OPTARG"
