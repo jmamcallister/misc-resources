@@ -25,6 +25,7 @@ prg=$( basename "${BASH_SOURCE[0]}" )
 prg_dir=$( cd `dirname "${BASH_SOURCE[0]}"` && pwd )
 
 [ -r "${prg_dir}/${prg%.*}.conf" ] && . "${prg_dir}/${prg%.*}.conf"
+[ -r "${prg_dir}/../etc/${prg%.*}.conf" ] && . "${prg_dir}/../etc/${prg%.*}.conf"
 
 while getopts ":c:" opt; do
     case $opt in
