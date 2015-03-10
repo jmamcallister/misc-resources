@@ -1,0 +1,36 @@
+#######################################
+#
+# Put the following into /etc/bash_completion.d/YOUR_PROG
+# for tab auto-completion of sub-commands and options
+#
+# For now, source it before running your script. It assumes
+# that your script and it's auto-completion are of the form
+#
+#   ./my_script.sh
+#   ./my_script_completion
+#
+#######################################
+prg=$( basename "${BASH_SOURCE[0]}" )
+prg_dir=$( cd `dirname "${BASH_SOURCE[0]}"` && pwd )
+
+_func()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts=$( ${prg_dir}/${prg%_completion*}.sh shortlist )
+
+    if [ $COMP_CWORD -eq 1 ]; then
+        COMPREPLY=( $(compgen -W "${opts}" -- $cur) )
+    elif [ $COMP_CWORD -eq 2 ]; then
+        case "$prev" in
+            multi)
+                local multi_cmds="one two three"
+                COMPREPLY=( $(compgen -W "${multi_cmds}" -- $cur) )
+                ;;
+        esac
+    fi
+    return 0    
+}
+complete -F _func "${prg_dir}/${prg%_completion*}.sh"
