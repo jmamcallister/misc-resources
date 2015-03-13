@@ -19,10 +19,10 @@ TMP_FILES=""
 # Returns:
 #  
 #######################################
-die() { ${ECHO} "FATAL: $@" >&2; exit 1; }
+die() { ${ECHO} "FATAL: ${*}" >&2; exit 1; }
 
-prg=$( basename "${BASH_SOURCE[0]}" )
-prg_dir=$( cd `dirname "${BASH_SOURCE[0]}"` && pwd )
+prg=$( basename "${0}" )
+prg_dir=$( cd "$(dirname "$0")" ; pwd -P )
 
 _usage="Usage: ${prg} [-c FILE] [-h]
 Some script
@@ -46,7 +46,7 @@ while getopts ":c:h" opt; do
     case $opt in
         c)
             [ ! -r "${OPTARG}" ] && die "Cannot read config file ${OPTARG}"
-            . ${OPTARG}
+            . "${OPTARG}"
             ;;
         h)
             echo "${_usage}"; exit 0
@@ -88,7 +88,7 @@ info()
     else
         ${LOGGER} -s \
             -t ${LOGGER_TAG} \
-            -p ${LOGGER_INFO_PRIORTY} "INFORMATION: $@"
+            -p ${LOGGER_INFO_PRIORTY} "INFORMATION: ${*}"
     fi
 }
 
@@ -115,7 +115,7 @@ warn()
     else
         ${LOGGER} -s \
             -t ${LOGGER_TAG} \
-            -p ${LOGGER_WARN_PRIORTY} "WARN: $@"
+            -p ${LOGGER_WARN_PRIORTY} "WARN: ${*}"
     fi
 }
 
@@ -142,7 +142,7 @@ error()
     else
         ${LOGGER} -s \
             -t ${LOGGER_TAG} \
-            -p ${LOGGER_ERROR_PRIORTY} "ERROR: $@"
+            -p ${LOGGER_ERROR_PRIORTY} "ERROR: ${*}"
     fi
 }
 
@@ -185,7 +185,7 @@ graceful_exit()
     [ "${#}" -gt 1 -a "${1}" -eq 0 ] && info "${2}"
     [ "${#}" -gt 1 -a "${1}" -gt 0 ] && error "${2}"
     cleanup
-    exit ${1}
+    exit "${1}"
 }
 
 graceful_exit 0 "It worked!"
