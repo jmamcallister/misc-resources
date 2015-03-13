@@ -10,8 +10,8 @@
 #   ./my_script_completion
 #
 #######################################
-prg=$( basename "${BASH_SOURCE[0]}" )
-prg_dir=$( cd `dirname "${BASH_SOURCE[0]}"` && pwd )
+prg=$( basename "${0}" )
+prg_dir=$( cd "$(dirname "$0")" ; pwd -P )
 
 _func()
 {
