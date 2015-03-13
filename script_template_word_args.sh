@@ -8,17 +8,18 @@ LOGGER_TAG="YOUR_PROG"
 RM=/bin/rm
 TMP_FILES=""
 
-die() { ${ECHO} "FATAL: $@" >&2; exit 1; }
+die() { ${ECHO} "FATAL: ${*}" >&2; exit 1; }
 
-prg=$( basename "${BASH_SOURCE[0]}" )
-prg_dir=$( cd `dirname "${BASH_SOURCE[0]}"` && pwd )
+prg=$( basename "${0}" )
+prg_dir=$( cd "$(dirname "$0")" ; pwd -P )
 cmds="single multi help"
 _usage="Usage: ${prg} { func | help }
 Some script
 
 Commands:
-    func        Do something
-    usage       Display this help
+    single      Do something
+    multi       Do something else
+    help        Show help
 "
 [ -r "${prg_dir}/${prg%.*}.conf" ] && . "${prg_dir}/${prg%.*}.conf"
 [ -r "${prg_dir}/../etc/${prg%.*}.conf" ] && . "${prg_dir}/../etc/${prg%.*}.conf"
@@ -51,7 +52,7 @@ info()
     else
         ${LOGGER} -s \
             -t ${LOGGER_TAG} \
-            -p ${LOGGER_INFO_PRIORTY} "INFORMATION: $@"
+            -p ${LOGGER_INFO_PRIORTY} "INFORMATION: ${*}"
     fi
 }
 
@@ -78,7 +79,7 @@ warn()
     else
         ${LOGGER} -s \
             -t ${LOGGER_TAG} \
-            -p ${LOGGER_WARN_PRIORTY} "WARN: $@"
+            -p ${LOGGER_WARN_PRIORTY} "WARN: ${*}"
     fi
 }
 
@@ -105,7 +106,7 @@ error()
     else
         ${LOGGER} -s \
             -t ${LOGGER_TAG} \
-            -p ${LOGGER_ERROR_PRIORTY} "ERROR: $@"
+            -p ${LOGGER_ERROR_PRIORTY} "ERROR: ${*}"
     fi
 }
 
@@ -148,7 +149,7 @@ graceful_exit()
     [ "${#}" -gt 1 -a "${1}" -eq 0 ] && info "${2}"
     [ "${#}" -gt 1 -a "${1}" -gt 0 ] && error "${2}"
     cleanup
-    exit ${1}
+    exit "${1}"
 }
 
 case ${1} in
@@ -159,13 +160,13 @@ case ${1} in
             shift
             die "Invalid option(s) - ${*}"
         fi
-        echo "Your options: ${@}"
+        echo "Your options:" "${@}"
         ;;
     multi)
         if [ "${#}" -lt 2 ]; then
             die "Missing option(s) - ${1}"
         fi
-        echo "Your options: ${@}"
+        echo "Your options:" "${@}"
         ;;
     help)
         echo "${_usage}"; exit 0
