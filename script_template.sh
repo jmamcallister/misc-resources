@@ -30,8 +30,9 @@ Some script
 Options:
 
     -c FILE     Use FILE for configuration. Order of configuration loading:
-                    ${prg_dir}/${prg%.*}.conf
+                    /usr/local/etc/${prg%.*}.conf
                     ${prg_dir}/../etc/${prg%.*}.conf
+                    ${prg_dir}/${prg%.*}.conf
                 These configurations can be overridden by FILE. The second entry
                 in the order is based on users having a folder structure like
                 '~/bin/' for their own scripts and '~/etc/' for their own
