@@ -8,11 +8,11 @@ LOGGER_TAG="YOUR_PROG"
 RM=/bin/rm
 TMP_FILES=""
 
-die() { ${ECHO} "FATAL: ${*}" >&2; exit 1; }
+cmds="single multi help"
 
 prg=$( basename "${0}" )
 prg_dir=$( cd "$(dirname "$0")" ; pwd -P )
-cmds="single multi help"
+
 _usage="Usage: ${prg} { func | help }
 Some script
 
@@ -21,108 +21,12 @@ Commands:
     multi       Do something else
     help        Show help
 "
-[ -r "${prg_dir}/${prg%.*}.conf" ] && . "${prg_dir}/${prg%.*}.conf"
-[ -r "${prg_dir}/../etc/${prg%.*}.conf" ] && . "${prg_dir}/../etc/${prg%.*}.conf"
+die() { ${ECHO} "FATAL: ${*}" >&2; exit 1; }
+info() { ${ECHO} "INFO: ${*}"; }
+warn() { ${ECHO} "WARN: ${*}"; }
+error() { ${ECHO} "ERROR: ${*}" >&2; }
+usage() { echo "${_usage}"; exit 0; }
 
-[ -z "${LOGGER}" ] && LOGGER=/bin/logger
-[ -z "${LOGGER_INFO_PRIORTY}" ] && LOGGER_INFO_PRIORTY="user.notice"
-[ -z "${LOGGER_WARN_PRIORTY}" ] && LOGGER_WARN_PRIORTY="user.notice"
-[ -z "${LOGGER_ERROR_PRIORTY}" ] && LOGGER_ERROR_PRIORTY="user.err"
-
-#######################################
-# Action : 
-#   Log at INFO level
-# Globals:
-#   LOGGER
-#   LOGGER_TAG
-#   LOGGER_INFO_PRIORTY
-# Arguments:
-#   Message string
-# Returns:
-#  
-#######################################
-info()
-{
-    if [ ${#} -eq 0 ]; then
-        while read data; do
-            ${LOGGER} -s \
-                -t ${LOGGER_TAG} \
-                -p ${LOGGER_INFO_PRIORTY} "INFORMATION: ${data}"
-        done
-    else
-        ${LOGGER} -s \
-            -t ${LOGGER_TAG} \
-            -p ${LOGGER_INFO_PRIORTY} "INFORMATION: ${*}"
-    fi
-}
-
-#######################################
-# Action : 
-#   Log at WARN level
-# Globals:
-#   LOGGER
-#   LOGGER_TAG
-#   LOGGER_INFO_PRIORTY
-# Arguments:
-#   Message string
-# Returns:
-#  
-#######################################
-warn()
-{
-    if [ ${#} -eq 0 ]; then
-        while read data; do
-            ${LOGGER} -s \
-            -t ${LOGGER_TAG} \
-            -p ${LOGGER_WARN_PRIORTY} "WARN: ${data}"
-        done
-    else
-        ${LOGGER} -s \
-            -t ${LOGGER_TAG} \
-            -p ${LOGGER_WARN_PRIORTY} "WARN: ${*}"
-    fi
-}
-
-#######################################
-# Action : 
-#   Log at ERROR level
-# Globals:
-#   LOGGER
-#   LOGGER_TAG
-#   LOGGER_INFO_PRIORTY
-# Arguments:
-#   Message string
-# Returns:
-#  
-#######################################
-error()
-{
-    if [ ${#} -eq 0 ]; then
-        while read data; do
-            ${LOGGER} -s \
-                -t ${LOGGER_TAG} \
-                -p ${LOGGER_ERROR_PRIORTY} "ERROR: ${data}"
-        done
-    else
-        ${LOGGER} -s \
-            -t ${LOGGER_TAG} \
-            -p ${LOGGER_ERROR_PRIORTY} "ERROR: ${*}"
-    fi
-}
-
-#######################################
-# Action : 
-#   Perform cleanup tasks before
-#   exiting script
-#   - Remove any temporary files
-# Globals:
-#   RM
-#   TMP_FILES
-# Arguments:
-#   None
-# Returns:
-#  
-#######################################
 cleanup()
 {
     for _file in ${TMP_FILES}; do
@@ -130,20 +34,6 @@ cleanup()
     done
 }
 
-#######################################
-# Action : 
-#   - Log info or error message
-#   - Perform clean tasks
-#   - Exit script with provided status
-#     code
-# Globals:
-#   None
-# Arguments:
-#   1 - Status code to exit with
-#   2 - (Optional) Message to log
-# Returns:
-#  
-#######################################
 graceful_exit()
 {
     [ "${#}" -gt 1 -a "${1}" -eq 0 ] && info "${2}"
@@ -151,6 +41,10 @@ graceful_exit()
     cleanup
     exit "${1}"
 }
+
+[ -r "/usr/local/etc/${prg%.*}.conf" ] && . "/usr/local/etc/${prg%.*}.conf"
+[ -r "${prg_dir}/../etc/${prg%.*}.conf" ] && . "${prg_dir}/../etc/${prg%.*}.conf"
+[ -r "${prg_dir}/${prg%.*}.conf" ] && . "${prg_dir}/${prg%.*}.conf"
 
 case ${1} in
     single)
