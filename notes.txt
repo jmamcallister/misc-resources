@@ -1,0 +1,33 @@
+# MySQL
+
+    # Show tables containing particular column names
+
+    SELECT DISTINCT TABLE_NAME
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE COLUMN_NAME IN ('col_name')
+    AND TABLE_SCHEMA = 'db_name';
+
+    # Show tables with > 0 rows (estimated from indices)
+
+    SELECT TABLE_NAME,TABLE_ROWS
+    FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_SCHEMA = 'db_name'
+    AND TABLE_ROWS > 0;
+
+    # Script-friendly output
+
+    mysql -sN \
+    -u db_user -pdb_pass \
+    -h db_host \
+    db_name \
+    -e "SELECT col FROM table"
+    
+# BSD sed
+
+    # sed -i '' 's/old/new/g' file
+
+# Poor Man's CLOC (Count Lines of Code)
+
+    # BSD find
+
+    find -E . -type f -not -path "./.git*" -not path "./target*" -regex '.*\.(java|y[a]*ml|xml|properties|sql)' | xargs wc -l
