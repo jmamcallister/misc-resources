@@ -21,13 +21,56 @@
     -h db_host \
     db_name \
     -e "SELECT col FROM table"
-    
+
+# PostgreSQL
+
+    # Size of databases
+
+    SELECT
+    pg_database.datname,
+    pg_size_pretty(pg_database_size(pg_database.datname)) AS size
+    FROM pg_database;
+
 # BSD sed
 
-    # sed -i '' 's/old/new/g' file
+    # Substitution
+
+    sed -i '' 's/old/new/g' file
+
+    # Groups in sed
+
+    sed -n 's|text\(.*\)othertext|\1|p' ~/the/file
+
+# Command line uuid
+
+    uuidgen | tr "[:upper:]" "[:lower:]"
 
 # Poor Man's CLOC (Count Lines of Code)
 
     # BSD find
 
     find -E . -type f -not -path "./.git*" -not path "./target*" -regex '.*\.(java|y[a]*ml|xml|properties|sql)' | xargs wc -l
+
+# Sonar
+
+    docker container stop sonar; docker container rm sonar
+    docker run -d -p 9000:9000 --name sonar sonarqube:8.7-community
+    until curl -v --connect-timeout 100 http://localhost:9000/api/system/status | grep -w UP; do sleep 10; done
+    curl -v --connect-timeout 100 -u admin:admin -X POST 'http://localhost:9000/api/users/change_password?login=admin&previousPassword=admin&password=password'
+    ./gradlew --info clean build sonarqube -Dsonar.login=admin -Dsonar.password=password
+
+# Docker
+
+    # Remove intermediate <none> images
+
+    docker rmi $(docker images -f dangling=true -q)
+
+    # With AWS creds
+
+    docker build --tag <name>:<label> . && docker run --rm -v ~/.aws/credentials:/home/user/.aws/credentials:ro <name>:<label> CMD <options>
+
+# Sublime
+
+    # Select regex matching group
+
+    (?<=PrecedingTextPattern)TextYouWantToSelectUsually.*(?=OtherText)
